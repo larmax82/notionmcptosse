@@ -1,0 +1,81 @@
+# Notion MCP SSE Server - Endpoints & Implementation Details
+
+## Required Endpoints
+
+Based on the MCP TypeScript SDK's example for HTTP with SSE, the following endpoints are required for your Notion MCP SSE Server:
+
+### 1. Messages Endpoint (/messages)
+
+This endpoint handles synchronous message processing via HTTP POST.
+
+- Purpose: Process MCP client requests (tool calls, initialization)
+- Headers:
+  - Content-Type: application/json
+  - Authorization: Bearer <token> (for future auth implementation)
+- Request Body: MCP message object formatted as JSON
+- Response:
+  - Status: 200 OK (success), appropriate error codes for failures
+  - Content-Type: application/json
+  - Body: MCP response object
+
+### 2. SSE Endpoint (/sse)
+
+This endpoint establishes Server-Sent Events connections for streaming updates to clients.
+
+- Purpose: Establish SSE connection for streaming updates
+- Headers:
+  - Accept: text/event-stream
+  - Cache-Control: no-cache
+  - Connection: keep-alive
+  - Last-Event-ID: <id> (optional, for reconnection)
+- Response:
+  - Status: 200 OK
+  - Content-Type: text/event-stream
+  - Connection: keep-alive
+  - Cache-Control: no-cache
+  - Body: Stream of SSE events
+
+### 3. Health Check Endpoint (/health)
+
+Simple endpoint for monitoring the service health.
+
+- Purpose: Verify service is running and healthy
+- Response:
+  - Status: 200 OK if healthy
+  - Content-Type: application/json
+  - Body: {"status": "ok", "timestamp": "<iso-timestamp>"}
+
+### 4. Version/Info Endpoint (/info)
+
+Provides information about the server implementation.
+
+- Purpose: Return server metadata
+- Response:
+  - Status: 200 OK
+  - Content-Type: application/json
+  - Body: Contains name, version, transport type, and capabilities
+
+## SSE Event Types
+
+The SSE implementation must support several event types for MCP protocol compliance:
+
+1. Default Event (no explicit type) - For standard MCP protocol messages
+2. Error Event - For error notifications
+3. Ping/Heartbeat Event - To keep the connection alive
+4. Tool Update Event - For tool list updates
+5. Server Request Event - For server-initiated requests
+
+## Implementation Requirements
+
+1. Express.js Server Configuration with proper middleware and endpoint handlers
+2. Use the Built-in HTTP+SSE Transport from MCP SDK
+3. Implement Docker Configuration for containerization
+4. Deploy to Google Cloud Run with appropriate configuration
+5. Create example client connection code
+6. Implement security considerations:
+   - CORS Configuration
+   - Authentication
+   - Rate Limiting
+   - Secure Headers
+   - Cloud Run Configuration
+   - Secure Environment Variables in Secret Manager

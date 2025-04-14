@@ -1,0 +1,3 @@
+[submodule "notion-mcp-server"]
+	path = notion-mcp-server
+	url = ./notion-mcp-server
